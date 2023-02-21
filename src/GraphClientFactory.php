@@ -15,6 +15,7 @@ use GuzzleHttp\RequestOptions;
 use GuzzleHttp\Utils;
 use Http\Adapter\Guzzle7\Client as GuzzleAdapter;
 use Http\Promise\Promise;
+use Microsoft\Graph\Core\Adapter\HttplugAdapter;
 use Microsoft\Graph\Core\Middleware\GraphMiddleware;
 use Microsoft\Graph\Core\Middleware\Option\GraphTelemetryOption;
 use Microsoft\Kiota\Http\KiotaClientFactory;
@@ -140,21 +141,7 @@ final class GraphClientFactory extends KiotaClientFactory
      * @return HttpClientInterface
      */
     public static function createAdapter(): HttpClientInterface {
-        return new class(self::create()) implements HttpClientInterface {
-            private $clientAdapter;
-
-            public function __construct(Client $guzzleClient) {
-                $this->clientAdapter = new GuzzleAdapter($guzzleClient);
-            }
-
-            public function sendRequest(RequestInterface $request): ResponseInterface {
-                return $this->clientAdapter->sendRequest($request);
-            }
-
-            public function sendAsyncRequest(RequestInterface $request): Promise {
-                return $this->clientAdapter->sendAsyncRequest($request);
-            }
-        };
+        return new HttplugAdapter(new GuzzleAdapter(self::create()));
     }
 
     /**
